@@ -49,13 +49,13 @@ build_script:
   - if "%TARGET%"=="mingw" ctest --output-on-failure
 
   # msvc15 case
-  - if "%TARGET%"=="msvc15" cmake -G "Visual Studio 15 2017" -A "x64" ..\test-ci
+  - if "%TARGET%"=="msvc15" cmake -G "Visual Studio 15 2017" -A %platform% ..\test-ci
   - if "%TARGET%"=="msvc15" cmake --build . --config %configuration% -- /m:2
   - if "%TARGET%"=="msvc15" dir C:\projects\test-ci\build
   - if "%TARGET%"=="msvc15" ctest --output-on-failure
 
   # uwp-msvc15 case
-  - if "%TARGET%"=="uwp-msvc15" cmake -G "Visual Studio 15 2017" -A "x64" -DCMAKE_SYSTEM_NAME:String=WindowsStore -DCMAKE_SYSTEM_VERSION:String="10.0" -DBUILD_DEMOS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TUTORIALS=OFF ..\test-ci
+  - if "%TARGET%"=="uwp-msvc15" cmake -G "Visual Studio 15 2017" -A %platform% -DCMAKE_SYSTEM_NAME:String=WindowsStore -DCMAKE_SYSTEM_VERSION:String="10.0" -DBUILD_DEMOS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TUTORIALS=OFF ..\test-ci
   - if "%TARGET%"=="uwp-msvc15" cmake --build . --config %configuration% -- /m:2
   - if "%TARGET%"=="uwp-msvc15" dir C:\projects\test-ci\build
 
