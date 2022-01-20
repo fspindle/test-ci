@@ -14,8 +14,20 @@ configuration:
 environment:
   matrix:
     - TARGET: mingw
+        CMAKE_GENERATOR: MinGW Makefiles
+        BUILD_NAME: mingw
+
     - TARGET: msvc15
+        CMAKE_GENERATOR: Visual Studio 15 2017
+        BUILD_NAME: vs2017
+        PLATFORM: x64
+
     - TARGET: uwp-msvc15
+        CMAKE_GENERATOR: Visual Studio 15 2017
+        BUILD_NAME: uwp-vs2017
+        PLATFORM: x64
+        SYSTEM_NAME: String=WindowsStore
+        SYSTEM_VERSION: String="10.0"
 
 # Scripts that are called at very beginning, before repo cloning
 init:
@@ -43,19 +55,19 @@ build_script:
   - md C:\projects\test-ci\build
   - cd C:\projects\test-ci\build
   # mingw case
-  - if "%TARGET%"=="mingw" cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%configuration% ..\test-ci
+  - if "%TARGET%"=="mingw" cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% ..\test-ci
   - if "%TARGET%"=="mingw" cmake --build . --config %configuration% -- -j2
   - if "%TARGET%"=="mingw" dir C:\projects\test-ci\build
   - if "%TARGET%"=="mingw" ctest --output-on-failure
 
   # msvc15 case
-  - if "%TARGET%"=="msvc15" cmake -G "Visual Studio 15 2017" -A "x64" ..\test-ci
+  - if "%TARGET%"=="msvc15" cmake -G "%CMAKE_GENERATOR%" -A "%PLATFORM" ..\test-ci
   - if "%TARGET%"=="msvc15" cmake --build . --config %configuration% -- /m:2
   - if "%TARGET%"=="msvc15" dir C:\projects\test-ci\build
   - if "%TARGET%"=="msvc15" ctest --output-on-failure
 
   # uwp-msvc15 case
-  - if "%TARGET%"=="uwp-msvc15" cmake -G "Visual Studio 15 2017" -A "x64" -DCMAKE_SYSTEM_NAME:%SYSTEM_NAME% -DCMAKE_SYSTEM_VERSION:%SYSTEM_VERSION% -DBUILD_DEMOS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TUTORIALS=OFF ..\test-ci
+  - if "%TARGET%"=="uwp-msvc15" cmake -G "%CMAKE_GENERATOR%" -A "%PLATFORM" -DCMAKE_SYSTEM_NAME:%SYSTEM_NAME% -DCMAKE_SYSTEM_VERSION:%SYSTEM_VERSION% -DBUILD_DEMOS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TUTORIALS=OFF ..\test-ci
   - if "%TARGET%"=="uwp-msvc15" cmake --build . --config %configuration% -- /m:2
   - if "%TARGET%"=="uwp-msvc15" dir C:\projects\test-ci\build
 
