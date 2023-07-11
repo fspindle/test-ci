@@ -13,10 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [windows-2019]
+        name: [windows-latest]
 
         include:
-          - name: windows-2019
+          - name: windows-latest
             os: windows-2019
 
     # https://github.com/marketplace/actions/cancel-workflow-action
