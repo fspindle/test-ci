@@ -32,12 +32,11 @@ jobs:
       run: pwd
 
     - name: Clone visp-images
-      env:
-        VISP_INPUT_IMAGE_PATH: ${{ HOME }}
+      shell: bash
       # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
       run: |
-        git clone --depth 1 https://github.com/lagadic/visp-images %VISP_INPUT_IMAGE_PATH%/visp-images
-        echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
+        git clone --depth 1 https://github.com/lagadic/visp-images ${HOME}/visp-images
+        echo "VISP_INPUT_IMAGE_PATH=$HOME" >> $GITHUB_ENV
 
     - name: Configure ViSP
       shell: bash
