@@ -1,6 +1,6 @@
-project(test-ci)
-
 cmake_minimum_required(VERSION 3.0)
+
+project(test-ci)
 
 add_executable(mytest mytest.cpp)
 
