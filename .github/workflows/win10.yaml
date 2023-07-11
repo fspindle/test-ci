@@ -28,7 +28,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Display the path
+    - name: Display the workspace path
+      working-directory: ${{ github.workspace }}
       run: pwd
 
     - name: Clone visp-images
