@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash
+        shell: cmd
     strategy:
       fail-fast: false
       matrix:
@@ -49,6 +49,7 @@ jobs:
     - name: Build ViSP
       working-directory: build
       run: |
+        pwd
         cmake --build . --config Release
 
     - name: Test ViSP
@@ -57,8 +58,8 @@ jobs:
       #  set PATH=%PATH%;%cd%\install\x64\vc16\bin
       #  ctest --output-on-failure -C Release -V
       run: |
+        ctest --output-on-failure -C Release -V
+        echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
         set PATH=%PATH%;${{ github.workspace }}\build
         echo "PATH: "
         echo %PATH%
-        echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
-        ctest --output-on-failure -C Release -V
