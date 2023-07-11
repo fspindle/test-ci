@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [windows-latest]
+        name: [windows-2019]
 
         include:
           - name: windows-2019
