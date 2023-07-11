@@ -1,0 +1,68 @@
+name: Windows 10
+
+# https://www.jeffgeerling.com/blog/2020/running-github-actions-workflow-on-schedule-and-other-events
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * SUN'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [[windows-latest]]
+
+        include:
+          - name: windows-latest
+            os: windows-2019
+
+    steps:
+    - name: Brief system information
+      timeout-minutes: 60
+      run: bash %GIT_CACHE%\print_system_information.sh
+
+    # https://github.com/marketplace/actions/cancel-workflow-action
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Display the path
+      shell: cmd
+      run: echo %cd%
+
+    - name: Clone visp-images
+      env:
+        BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
+      run: |
+        git clone --depth 1 https://github.com/lagadic/visp-images ${HOME}/visp-images
+        echo "VISP_INPUT_IMAGE_PATH=$HOME" >> $GITHUB_ENV
+        echo %VISP_INPUT_IMAGE_PATH%
+
+    - name: Configure ViSP
+      shell: cmd /C CALL {0}
+      run: |
+        mkdir build
+        cd build
+        echo "build folder is in: "
+        echo %cd%
+        cmake .. -G "Visual Studio 16 2019" -T "ClangCl" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
+      # type ViSP-third-party.txt
+
+    - name: Build ViSP
+      working-directory: build
+      run: |
+        cmake --build . --config Release
+
+    - name: Test ViSP
+      working-directory: build
+      run: |
+        set PATH=%PATH%;build\install\x64\vc16\bin
+        ctest --output-on-failure -C Release -V
