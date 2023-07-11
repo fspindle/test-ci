@@ -58,8 +58,8 @@ jobs:
       #  set PATH=%PATH%;%cd%\install\x64\vc16\bin
       #  ctest --output-on-failure -C Release -V
       run: |
-        ctest --output-on-failure -C Release -V
         echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
         set PATH=%PATH%;${{ github.workspace }}\build
         echo "PATH: "
         echo %PATH%
+        ctest --output-on-failure -C Release -V
