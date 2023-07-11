@@ -35,7 +35,7 @@ jobs:
       # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
       run: |
         git clone --depth 1 https://github.com/lagadic/visp-images ${HOME}/visp-images
-        echo "VISP_INPUT_IMAGE_PATH=$HOME" >> $GITHUB_ENV
+        set VISP_INPUT_IMAGE_PATH=${HOME}
         echo %VISP_INPUT_IMAGE_PATH%
 
     - name: Configure ViSP
@@ -45,7 +45,7 @@ jobs:
         cd build
         echo "build folder is in: "
         echo %cd%
-        cmake .. -G "Visual Studio 16 2019" -A "x64" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
+        cmake .. -G "Visual Studio 16 2019" -A "x64" -DCMAKE_GENERATOR_PLATFORM=x64
       # type ViSP-third-party.txt
 
     - name: Build ViSP
@@ -59,7 +59,10 @@ jobs:
       #  set PATH=%PATH%;%cd%\install\x64\vc16\bin
       #  ctest --output-on-failure -C Release -V
       run: |
-        set PATH=%PATH%;%cd%
+        set VISP_INPUT_IMAGE_PATH=${HOME}
+        echo %VISP_INPUT_IMAGE_PATH%
+        set BUILD_DIR=%cd%
+        set PATH=%PATH%;%BUILD_DIR%
         echo "Path: "
         echo %PATH%
         ctest --output-on-failure -C Release -V
