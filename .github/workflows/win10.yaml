@@ -1,4 +1,4 @@
-name: Windows 10
+name: Windows - Visual 2019
 
 # https://www.jeffgeerling.com/blog/2020/running-github-actions-workflow-on-schedule-and-other-events
 on:
@@ -16,13 +16,8 @@ jobs:
         name: [windows-latest]
 
         include:
-          - name: windows-latest
+          - name: windows-2019
             os: windows-2019
-
-    steps:
-    - name: Brief system information
-      timeout-minutes: 60
-      run: bash %GIT_CACHE%\print_system_information.sh
 
     # https://github.com/marketplace/actions/cancel-workflow-action
     - name: Cancel Previous Runs
@@ -53,7 +48,7 @@ jobs:
         cd build
         echo "build folder is in: "
         echo %cd%
-        cmake .. -G "Visual Studio 16 2019" -T "ClangCl" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
+        cmake .. -G "Visual Studio 16 2019" -A "x64" -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
       # type ViSP-third-party.txt
 
     - name: Build ViSP
