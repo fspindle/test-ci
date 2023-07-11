@@ -4,8 +4,8 @@ name: Windows - Visual 2019
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '0 2 * * SUN'
+#  schedule:
+#    - cron: '0 2 * * SUN'
 
 jobs:
   build:
