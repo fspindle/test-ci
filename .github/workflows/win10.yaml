@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [[windows-latest]]
+        name: [windows-latest]
 
         include:
           - name: windows-latest
