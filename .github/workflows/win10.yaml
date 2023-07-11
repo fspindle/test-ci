@@ -1,11 +1,7 @@
 name: Windows - Visual 2019
-
-# https://www.jeffgeerling.com/blog/2020/running-github-actions-workflow-on-schedule-and-other-events
 on:
-  push:
   pull_request:
-#  schedule:
-#    - cron: '0 2 * * SUN'
+  push:
 
 jobs:
   build:
@@ -19,6 +15,7 @@ jobs:
           - name: windows-latest
             os: windows-2019
 
+    steps:
     # https://github.com/marketplace/actions/cancel-workflow-action
     - name: Cancel Previous Runs
       uses: styfle/cancel-workflow-action@0.9.1
