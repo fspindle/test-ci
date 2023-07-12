@@ -504,6 +504,7 @@ int mkdir_p(const std::string &path_in, int mode)
     // Continue if sub_path = separator
     if (pos == 0) {
       std::cout << "sub_path = separaror" << std::endl;
+      _path.erase(0, pos + 1);
       continue;
     }
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
