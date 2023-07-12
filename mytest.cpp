@@ -324,12 +324,14 @@ bool checkDirectory(const std::string &dirname)
   if (_stat(_dirname.c_str(), &stbuf) != 0)
 #endif
   {
+    std::cout << "1 checkDirectory(" << _dirname << ") return false" << std::endl;
     return false;
   }
 #if defined(_WIN32) || (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if ((stbuf.st_mode & S_IFDIR) == 0)
 #endif
   {
+    std::cout << "2 checkDirectory(" << _dirname << ") return false" << std::endl;
     return false;
   }
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
@@ -338,8 +340,10 @@ bool checkDirectory(const std::string &dirname)
   if ((stbuf.st_mode & S_IWRITE) == 0)
 #endif
   {
+    std::cout << "3 checkDirectory(" << _dirname << ") return false" << std::endl;
     return false;
   }
+  std::cout << "4 checkDirectory(" << _dirname << ") return true" << std::endl;
   return true;
 }
 
