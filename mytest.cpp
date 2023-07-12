@@ -476,6 +476,58 @@ bool rootDrive(const std::string &path)
   }
 }
 
+#if 1
+int mkdir_p(const std::string &path_in, int mode)
+{
+  errno = 0;
+  if (path_in.size() > PATH_MAX) {
+    errno = ENAMETOOLONG;
+    return -1;
+  }
+
+  // Iterate over the string
+  std::string _path = path_in;
+  std::string _sub_path;
+  for (size_t pos = 0; (pos = _path.find(separator)) != std::string::npos;) {
+    _sub_path += _path.substr(0, pos + 1);
+    std::cout << "sub_path: " << _sub_path << std::endl;
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
+    if (mkdir(sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
+#elif defined(_WIN32)
+      (void)mode; // var not used
+      std::cout << "1 in mkdir_p() _path: " << _sub_path << std::endl;
+      std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_sub_path) << std::endl;
+      if (!checkDirectory(_sub_path) && _mkdir(_sub_path.c_str()) != 0)
+#endif
+      {
+        if (errno != EEXIST) {
+          std::cout << "1 in mkdir_p() return -1" << std::endl;
+          return -1;
+        }
+      }
+          _path.erase(0, pos + 1);
+    }
+
+if (!_path.empty()) {
+_sub_path += _path;
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
+  if (mkdir(_sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
+#elif defined(_WIN32)
+  std::cout << "2 in mkdir_p() path: " << _sub_path << std::endl;
+
+  if (_mkdir(_sub_path.c_str()) != 0)
+#endif
+  {
+    if (errno != EEXIST) {
+      std::cout << "2 in mkdir_p() return -1" << std::endl;
+      return -1;
+    }
+  }
+}
+
+  return 0;
+}
+#else
 int mkdir_p(const char *path, int mode)
 {
   /* Adapted from http://stackoverflow.com/a/2336245/119527 */
@@ -505,7 +557,7 @@ int mkdir_p(const char *path, int mode)
       (void)mode; // var not used
       std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
       std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_path) << std::endl;
-      if (/*!rootDrive(_path) &&*/!checkDirectory(_path) && _mkdir(_path) != 0)
+      if (!checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
       {
         if (errno != EEXIST) {
@@ -533,6 +585,7 @@ int mkdir_p(const char *path, int mode)
 
   return 0;
 }
+#endif
 
 void makeDirectory(const std::string &dirname)
 {
