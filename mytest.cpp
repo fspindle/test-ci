@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <stdexcept>
 #include <sstream>
+#include <exception>
 
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
 #include <dirent.h>
@@ -48,6 +49,161 @@ static const char separator =
 #else
 '/';
 #endif
+
+class vpException : public std::exception {
+protected:
+  //! Contains the error code, see the errorCodeEnum table for details.
+  int code;
+
+  //! Contains an error message (can be empty)
+  std::string message;
+
+  //! Set the message container
+  void setMessage(const char* format, va_list args);
+
+  //!  forbid the empty constructor (protected)
+  vpException() : code(notInitialized), message("") {};
+
+public:
+  enum generalExceptionEnum {
+    memoryAllocationError,       //!< Memory allocation error
+    memoryFreeError,             //!< Memory free error
+    functionNotImplementedError, //!< Function not implemented
+    ioError,                     //!< I/O error
+    cannotUseConstructorError,   //!< Contructor error
+    notImplementedError,         //!< Not implemented
+    divideByZeroError,           //!< Division by zero
+    dimensionError,              //!< Bad dimension
+    fatalError,                  //!< Fatal error
+    badValue,                    //!< Used to indicate that a value is not in the allowed range.
+    notInitialized               //!< Used to indicate that a parameter is not initialized.
+    };
+
+  vpException(int code, const char* format, va_list args);
+  vpException(int code, const char* format, ...);
+  vpException(int code, const std::string& msg);
+  explicit vpException(int code);
+
+  /*!
+    Basic destructor. Do nothing but implemented to fit the inheritance from
+    std::exception
+  */
+#if VISP_CXX_STANDARD > VISP_CXX_STANDARD_98
+  virtual ~vpException() {}
+#else
+  virtual ~vpException() throw() {}
+#endif
+
+  /** @name Inherited functionalities from vpException */
+  //@{
+  //! Send the object code.
+  int getCode() const;
+
+  //! Send a reference (constant) related the error message (can be empty).
+  const std::string& getStringMessage() const;
+  //! send a pointer on the array of  \e char related to the error string.
+  //! Cannot be  \e NULL.
+  const char* getMessage() const;
+  //@}
+
+  //! Print the error structure.
+  friend std::ostream& operator<<(std::ostream& os, const vpException& art);
+
+  const char* what() const throw();
+  };
+
+vpException::vpException(int id) : code(id), message() {}
+
+vpException::vpException(int id, const std::string& msg) : code(id), message(msg) {}
+
+vpException::vpException(int id, const char* format, ...) : code(id), message() {
+  va_list args;
+  va_start(args, format);
+  setMessage(format, args);
+  va_end(args);
+  }
+
+vpException::vpException(int id, const char* format, va_list args) : code(id), message() { setMessage(format, args); }
+/* ------------------------------------------------------------------------ */
+/* --- DESTRUCTORS -------------------------------------------------------- */
+/* ------------------------------------------------------------------------ */
+
+/* Destructeur par default suffisant. */
+// vpException::
+// ~vpException (void)
+// {
+// }
+
+void vpException::setMessage(const char* format, va_list args) {
+  char buffer[1024];
+  vsnprintf(buffer, 1024, format, args);
+  std::string msg(buffer);
+  message = msg;
+  }
+
+/* ------------------------------------------------------------------------ */
+/* --- ACCESSORS ---------------------------------------------------------- */
+/* ------------------------------------------------------------------------ */
+
+const char* vpException::getMessage() const { return (this->message).c_str(); }
+
+const std::string& vpException::getStringMessage() const { return this->message; }
+
+int vpException::getCode() const { return this->code; }
+
+/*!
+  Overloading of the what() method of std::exception to return the vpException
+  message.
+
+  \return pointer on the array of  \e char related to the error string.
+*/
+const char* vpException::what() const throw() { return (this->message).c_str(); }
+
+/* -------------------------------------------------------------------------
+ */
+ /* --- MODIFIORS -----------------------------------------------------------
+  */
+  /* -------------------------------------------------------------------------
+   */
+
+   /* -------------------------------------------------------------------------
+    */
+    /* --- OP << ---------------------------------------------------------------
+     */
+     /* -------------------------------------------------------------------------
+      */
+
+std::ostream& operator<<(std::ostream& os, const vpException& error) {
+  os << "Error [" << error.code << "]:\t" << error.message << std::endl;
+
+  return os;
+  }
+
+class vpIoException : public vpException {
+public:
+  /*!
+  \brief Lists the possible error than can be emitted while calling
+  vpIo member.
+ */
+  enum error {
+    invalidDirectoryName, /*! Directory name is invalid. */
+    cantCreateDirectory,  /*! Unable to create a directory. */
+    cantGetUserName,      /*! User name is not available. */
+    cantGetenv            /*! Cannot get environment variable value. */
+    };
+
+public:
+  vpIoException(int id, const char* format, ...) {
+    this->code = id;
+    va_list args;
+    va_start(args, format);
+    setMessage(format, args);
+    va_end(args);
+    }
+  vpIoException(int id, const std::string& msg) : vpException(id, msg) { ; }
+  explicit vpIoException(int id) : vpException(id) { ; }
+  };
+
 
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #if (TARGET_OS_IOS == 0) && !defined(__ANDROID__)
@@ -194,8 +350,7 @@ bool checkFifo(const std::string& fifofilename) {
   return true;
 #elif defined(_WIN32)
   (void)fifofilename;
-  printf("ERROR: Fifo files are not supported on Windows platforms.");
-  return false;
+  throw(vpIoException(vpIoException::notImplementedError, "Fifo files are not supported on Windows platforms."));
 #endif
   }
 
@@ -227,7 +382,8 @@ bool remove(const std::string& file_or_dir) {
     // std::cout << cmd << " return value: " << ret << std::endl;
     return true;
 #else
-    printf("ERROR: Cannot remove %s: not implemented on iOS Platform", file_or_dir.c_str());
+    throw(vpIoException(vpException::fatalError, "Cannot remove %s: not implemented on iOS Platform",
+      file_or_dir.c_str()));
 #endif
 #elif defined(_WIN32)
 #if (!defined(WINRT))
@@ -241,8 +397,8 @@ bool remove(const std::string& file_or_dir) {
     // std::cout << cmd << " return value: " << ret << std::endl;
     return true;
 #else
-    printf("ERROR: Cannot remove %s: not implemented on Universal Windows Platform",
-      file_or_dir.c_str());
+    throw(vpIoException(vpException::fatalError, "Cannot remove %s: not implemented on Universal Windows Platform",
+      file_or_dir.c_str()));
 #endif
 #endif
     }
@@ -356,7 +512,7 @@ void makeDirectory(const std::string& dirname) {
 #endif
 
   if (dirname.empty()) {
-    printf("ERROR: invalid directory name");
+    throw(vpIoException(vpIoException::invalidDirectoryName, "invalid directory name"));
     }
 
   std::string _dirname = path(dirname);
@@ -370,12 +526,12 @@ void makeDirectory(const std::string& dirname) {
 #endif
     {
     if (mkdir_p(_dirname.c_str(), 0755) != 0) {
-      printf("ERRORm mkdir_p(): Unable to create directory '%s'\n", _dirname.c_str());
+      throw(vpIoException(vpIoException::cantCreateDirectory, "Unable to create directory '%s'", dirname.c_str()));
       }
     }
 
   if (checkDirectory(dirname) == false) {
-    printf("ERROR checkDirectory(): Unable to create directory '%s'\n", _dirname.c_str());
+    throw(vpIoException(vpIoException::cantCreateDirectory, "Unable to create directory '%s'", dirname.c_str()));
     }
   }
 

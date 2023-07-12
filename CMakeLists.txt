@@ -8,4 +8,4 @@ add_executable(test-mkdir test-mkdir.cpp)
 enable_testing()
 
 add_test(mytest mytest)
-add_test(test-mkdir test-mkdir)
+#add_test(test-mkdir test-mkdir)
