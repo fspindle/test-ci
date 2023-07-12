@@ -575,7 +575,7 @@ std::string getTempPath()
   else {
     temp_path = "C:\temp";
     try {
-      vpIoTools::makeDirectory(temp_path);
+      makeDirectory(temp_path);
     }
     catch (...) {
       throw(vpException(vpException::fatalError, "Cannot set temp path to %s", temp_path.c_str()));
