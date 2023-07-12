@@ -674,6 +674,7 @@ std::string getTempPath()
 int main()
 {
   std::cout << "This is a wonderful test" << std::endl;
+#if defined(_WIN32)
   std::cout << "Is root drive C: : " << rootDrive("C:") << std::endl;
   std::cout << "Is root drive C:\\ : " << rootDrive("C:\\") << std::endl;
   std::cout << "Is root drive C:\\temp : " << rootDrive("C:\\temp") << std::endl;
@@ -681,7 +682,11 @@ int main()
   std::cout << "Check directory C: : " << checkDirectory("C:") << std::endl;
   std::cout << "Check directory C:\\ : " << checkDirectory("C:\\") << std::endl;
   std::cout << "Check directory C:\\temp : " << checkDirectory("C:\\temp") << std::endl;
-
+#else
+  std::cout << "Check directory /tmp : " << checkDirectory("/tmp") << std::endl;
+  std::cout << "Check directory /tmp/runner : " << checkDirectory("/tmp/runner") << std::endl;
+  std::cout << "Check directory /tmp/runner/myfolder : " << checkDirectory("/tmp/runner/myfolder") << std::endl;
+#endif
   std::string tmp_dir = getTempPath();
   // #if defined(_WIN32)
   //   std::string tmp_dir = "C:/temp/";
