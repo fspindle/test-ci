@@ -485,6 +485,7 @@ int mkdir_p(const char *path, int mode)
 #elif defined(_WIN32)
       (void)mode; // var not used
       std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
+      std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_path) << std::endl;
       if (!checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
       {
@@ -600,10 +601,11 @@ int main()
   // #endif
 
     // Get the user login name
-  std::string username;
-  getUserName(username);
+  // std::string username;
+  // getUserName(username);
 
-  tmp_dir += username + "/test_xml_parser_rect_oriented/";
+  //tmp_dir += "/" + username + "/test_xml_parser_rect_oriented/";
+  tmp_dir += "/test_xml_parser_rect_oriented/";
   remove(tmp_dir);
   std::cout << "Create: " << tmp_dir << std::endl;
   makeDirectory(tmp_dir);
