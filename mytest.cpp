@@ -324,8 +324,12 @@ bool checkDirectory(const std::string &dirname)
   if (_stat(_dirname.c_str(), &stbuf) != 0)
 #endif
   {
-    std::cout << "1 checkDirectory(" << _dirname << ") return false" << std::endl;
-    return false;
+    // Test again adding the separator to consider the specific case of a drive like "C:" that is not considered as a directory,
+    // while "C:\" is considered as a directory
+    if (_stat((_dirname + separator).c_str(), &stbuf) != 0) {
+      std::cout << "1 checkDirectory(" << _dirname << ") return false" << std::endl;
+      return false;
+    }
   }
 #if defined(_WIN32) || (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if ((stbuf.st_mode & S_IFDIR) == 0)
@@ -501,7 +505,7 @@ int mkdir_p(const char *path, int mode)
       (void)mode; // var not used
       std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
       std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_path) << std::endl;
-      if (!rootDrive(_path) && !checkDirectory(_path) && _mkdir(_path) != 0)
+      if (/*!rootDrive(_path) &&*/!checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
       {
         if (errno != EEXIST) {
@@ -610,6 +614,11 @@ int main()
   std::cout << "Is root drive C: : " << rootDrive("C:") << std::endl;
   std::cout << "Is root drive C:\\ : " << rootDrive("C:\\") << std::endl;
   std::cout << "Is root drive C:\\temp : " << rootDrive("C:\\temp") << std::endl;
+
+  std::cout << "Check directory C: : " << checkDirectory("C:") << std::endl;
+  std::cout << "Check directory C:\\ : " << checkDirectory("C:\\") << std::endl;
+  std::cout << "Check directory C:\\temp : " << checkDirectory("C:\\temp") << std::endl;
+
   std::string tmp_dir = getTempPath();
   // #if defined(_WIN32)
   //   std::string tmp_dir = "C:/temp/";
