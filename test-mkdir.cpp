@@ -5,6 +5,9 @@
 #ifdef _WIN32
 #include <direct.h>
 #define MKDIR(PATH) ::_mkdir(PATH)
+#ifndef S_ISDIR
+#define S_ISDIR(mode) _S_ISTYPE((mode), _S_IFDIR)
+#endif
 #else
 #define MKDIR(PATH) ::mkdir(PATH, 0755)
 #endif
