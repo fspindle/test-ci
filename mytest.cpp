@@ -311,11 +311,14 @@ int mkdir_p(const char* path, int mode) {
       if (mkdir(_path, static_cast<mode_t>(mode)) != 0)
 #elif defined(_WIN32)
       (void)mode; // var not used
+      std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
       if (!checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
         {
-        if (errno != EEXIST)
+        if (errno != EEXIST) {
+          std::cout << "1 in mkdir_p() return -1" << std::endl;
           return -1;
+          }
         }
       *p = sep;
       }
@@ -324,11 +327,15 @@ int mkdir_p(const char* path, int mode) {
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if (mkdir(_path, static_cast<mode_t>(mode)) != 0)
 #elif defined(_WIN32)
+  std::cout << "2 in mkdir_p() _path: " << _path << std::endl;
+
   if (_mkdir(_path) != 0)
 #endif
     {
-    if (errno != EEXIST)
+    if (errno != EEXIST) {
+      std::cout << "2 in mkdir_p() return -1" << std::endl;
       return -1;
+      }
     }
 
   return 0;
