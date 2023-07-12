@@ -363,12 +363,12 @@ void makeDirectory(const std::string& dirname) {
 #endif
     {
     if (mkdir_p(_dirname.c_str(), 0755) != 0) {
-      printf("ERROR: Unable to create directory '%s'", dirname.c_str());
+      printf("ERRORm mkdir_p(): Unable to create directory '%s'\n", _dirname.c_str());
       }
     }
 
   if (checkDirectory(dirname) == false) {
-    printf("ERROR: Unable to create directory '%s'", dirname.c_str());
+    printf("ERROR checkDirectory(): Unable to create directory '%s'\n", _dirname.c_str());
     }
   }
 
