@@ -316,11 +316,17 @@ bool checkDirectory(const std::string &dirname)
     return false;
   }
 #elif defined(_WIN32) && defined(__MINGW32__)
+  //int ret = stat(_dirname.c_str(), &stbuf);
+  //std::cout << "Code retour stat(" << _dirname << ") 1: " << ret << std::endl;
   // Remove trailing separator character if any
   // AppVeyor: Windows 6.3.9600 AMD64 ; C:/MinGW/bin/g++.exe  (ver 5.3.0) ;
   // GNU Make 3.82.90 Built for i686-pc-mingw32
-  if (_dirname.at(_dirname.size() - 1) == separator)
-    _dirname = _dirname.substr(0, _dirname.size() - 1);
+  //if (_dirname.at(_dirname.size() - 1) == separator)
+  //  _dirname = _dirname.substr(0, _dirname.size() - 1);
+  //{
+   // ret = stat(_dirname.c_str(), &stbuf);
+  //std::cout << "Code retour stat(" << _dirname << ") 2: " << ret << std::endl;
+  //}
   if (stat(_dirname.c_str(), &stbuf) != 0) {
     return false;
   }
