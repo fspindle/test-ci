@@ -312,18 +312,20 @@ bool checkDirectory(const std::string &dirname)
   std::string _dirname = path(dirname);
 
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
-  if (stat(_dirname.c_str(), &stbuf) != 0)
+  if (stat(_dirname.c_str(), &stbuf) != 0) {
+    return false;
+  }
 #elif defined(_WIN32) && defined(__MINGW32__)
   // Remove trailing separator character if any
   // AppVeyor: Windows 6.3.9600 AMD64 ; C:/MinGW/bin/g++.exe  (ver 5.3.0) ;
   // GNU Make 3.82.90 Built for i686-pc-mingw32
   if (_dirname.at(_dirname.size() - 1) == separator)
     _dirname = _dirname.substr(0, _dirname.size() - 1);
-  if (stat(_dirname.c_str(), &stbuf) != 0)
+  if (stat(_dirname.c_str(), &stbuf) != 0) {
+    return false;
+  }
 #elif defined(_WIN32)
-  if (_stat(_dirname.c_str(), &stbuf) != 0)
-#endif
-  {
+  if (_stat(_dirname.c_str(), &stbuf) != 0) {
     // Test again adding the separator to consider the specific case of a drive like "C:" that is not considered as a directory,
     // while "C:\" is considered as a directory
     if (_stat((_dirname + separator).c_str(), &stbuf) != 0) {
@@ -331,6 +333,8 @@ bool checkDirectory(const std::string &dirname)
       return false;
     }
   }
+#endif
+
 #if defined(_WIN32) || (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if ((stbuf.st_mode & S_IFDIR) == 0)
 #endif
@@ -492,38 +496,38 @@ int mkdir_p(const std::string &path_in, int mode)
     _sub_path += _path.substr(0, pos + 1);
     std::cout << "sub_path: " << _sub_path << std::endl;
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
-    if (mkdir(sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
+    if (mkdir(_sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
 #elif defined(_WIN32)
-      (void)mode; // var not used
-      std::cout << "1 in mkdir_p() _path: " << _sub_path << std::endl;
-      std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_sub_path) << std::endl;
-      if (!checkDirectory(_sub_path) && _mkdir(_sub_path.c_str()) != 0)
+    (void)mode; // var not used
+    std::cout << "1 in mkdir_p() _path: " << _sub_path << std::endl;
+    std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_sub_path) << std::endl;
+    if (!checkDirectory(_sub_path) && _mkdir(_sub_path.c_str()) != 0)
 #endif
-      {
-        if (errno != EEXIST) {
-          std::cout << "1 in mkdir_p() return -1" << std::endl;
-          return -1;
-        }
+    {
+      if (errno != EEXIST) {
+        std::cout << "1 in mkdir_p() return -1" << std::endl;
+        return -1;
       }
-          _path.erase(0, pos + 1);
     }
+    _path.erase(0, pos + 1);
+  }
 
-if (!_path.empty()) {
-_sub_path += _path;
+  if (!_path.empty()) {
+    _sub_path += _path;
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
-  if (mkdir(_sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
+    if (mkdir(_sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
 #elif defined(_WIN32)
-  std::cout << "2 in mkdir_p() path: " << _sub_path << std::endl;
+    std::cout << "2 in mkdir_p() path: " << _sub_path << std::endl;
 
-  if (_mkdir(_sub_path.c_str()) != 0)
+    if (_mkdir(_sub_path.c_str()) != 0)
 #endif
-  {
-    if (errno != EEXIST) {
-      std::cout << "2 in mkdir_p() return -1" << std::endl;
-      return -1;
+    {
+      if (errno != EEXIST) {
+        std::cout << "2 in mkdir_p() return -1" << std::endl;
+        return -1;
+      }
     }
   }
-}
 
   return 0;
 }
