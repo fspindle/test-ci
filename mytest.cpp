@@ -50,7 +50,8 @@ static const char separator =
 '/';
 #endif
 
-class vpException : public std::exception {
+class vpException : public std::exception
+{
 protected:
   //! Contains the error code, see the errorCodeEnum table for details.
   int code;
@@ -59,13 +60,14 @@ protected:
   std::string message;
 
   //! Set the message container
-  void setMessage(const char* format, va_list args);
+  void setMessage(const char *format, va_list args);
 
   //!  forbid the empty constructor (protected)
-  vpException() : code(notInitialized), message("") {};
+  vpException() : code(notInitialized), message("") { };
 
 public:
-  enum generalExceptionEnum {
+  enum generalExceptionEnum
+  {
     memoryAllocationError,       //!< Memory allocation error
     memoryFreeError,             //!< Memory free error
     functionNotImplementedError, //!< Function not implemented
@@ -77,11 +79,11 @@ public:
     fatalError,                  //!< Fatal error
     badValue,                    //!< Used to indicate that a value is not in the allowed range.
     notInitialized               //!< Used to indicate that a parameter is not initialized.
-    };
+  };
 
-  vpException(int code, const char* format, va_list args);
-  vpException(int code, const char* format, ...);
-  vpException(int code, const std::string& msg);
+  vpException(int code, const char *format, va_list args);
+  vpException(int code, const char *format, ...);
+  vpException(int code, const std::string &msg);
   explicit vpException(int code);
 
   /*!
@@ -89,9 +91,9 @@ public:
     std::exception
   */
 #if VISP_CXX_STANDARD > VISP_CXX_STANDARD_98
-  virtual ~vpException() {}
+  virtual ~vpException() { }
 #else
-  virtual ~vpException() throw() {}
+  virtual ~vpException() throw() { }
 #endif
 
   /** @name Inherited functionalities from vpException */
@@ -100,30 +102,31 @@ public:
   int getCode() const;
 
   //! Send a reference (constant) related the error message (can be empty).
-  const std::string& getStringMessage() const;
+  const std::string &getStringMessage() const;
   //! send a pointer on the array of  \e char related to the error string.
   //! Cannot be  \e NULL.
-  const char* getMessage() const;
+  const char *getMessage() const;
   //@}
 
   //! Print the error structure.
-  friend std::ostream& operator<<(std::ostream& os, const vpException& art);
+  friend std::ostream &operator<<(std::ostream &os, const vpException &art);
 
-  const char* what() const throw();
-  };
+  const char *what() const throw();
+};
 
-vpException::vpException(int id) : code(id), message() {}
+vpException::vpException(int id) : code(id), message() { }
 
-vpException::vpException(int id, const std::string& msg) : code(id), message(msg) {}
+vpException::vpException(int id, const std::string &msg) : code(id), message(msg) { }
 
-vpException::vpException(int id, const char* format, ...) : code(id), message() {
+vpException::vpException(int id, const char *format, ...) : code(id), message()
+{
   va_list args;
   va_start(args, format);
   setMessage(format, args);
   va_end(args);
-  }
+}
 
-vpException::vpException(int id, const char* format, va_list args) : code(id), message() { setMessage(format, args); }
+vpException::vpException(int id, const char *format, va_list args) : code(id), message() { setMessage(format, args); }
 /* ------------------------------------------------------------------------ */
 /* --- DESTRUCTORS -------------------------------------------------------- */
 /* ------------------------------------------------------------------------ */
@@ -134,20 +137,21 @@ vpException::vpException(int id, const char* format, va_list args) : code(id), m
 // {
 // }
 
-void vpException::setMessage(const char* format, va_list args) {
+void vpException::setMessage(const char *format, va_list args)
+{
   char buffer[1024];
   vsnprintf(buffer, 1024, format, args);
   std::string msg(buffer);
   message = msg;
-  }
+}
 
 /* ------------------------------------------------------------------------ */
 /* --- ACCESSORS ---------------------------------------------------------- */
 /* ------------------------------------------------------------------------ */
 
-const char* vpException::getMessage() const { return (this->message).c_str(); }
+const char *vpException::getMessage() const { return (this->message).c_str(); }
 
-const std::string& vpException::getStringMessage() const { return this->message; }
+const std::string &vpException::getStringMessage() const { return this->message; }
 
 int vpException::getCode() const { return this->code; }
 
@@ -157,7 +161,7 @@ int vpException::getCode() const { return this->code; }
 
   \return pointer on the array of  \e char related to the error string.
 */
-const char* vpException::what() const throw() { return (this->message).c_str(); }
+const char *vpException::what() const throw() { return (this->message).c_str(); }
 
 /* -------------------------------------------------------------------------
  */
@@ -173,52 +177,58 @@ const char* vpException::what() const throw() { return (this->message).c_str(); 
      /* -------------------------------------------------------------------------
       */
 
-std::ostream& operator<<(std::ostream& os, const vpException& error) {
+std::ostream &operator<<(std::ostream &os, const vpException &error)
+{
   os << "Error [" << error.code << "]:\t" << error.message << std::endl;
 
   return os;
-  }
+}
 
-class vpIoException : public vpException {
+class vpIoException : public vpException
+{
 public:
   /*!
   \brief Lists the possible error than can be emitted while calling
   vpIo member.
  */
-  enum error {
+  enum error
+  {
     invalidDirectoryName, /*! Directory name is invalid. */
     cantCreateDirectory,  /*! Unable to create a directory. */
     cantGetUserName,      /*! User name is not available. */
     cantGetenv            /*! Cannot get environment variable value. */
-    };
+  };
 
 public:
-  vpIoException(int id, const char* format, ...) {
+  vpIoException(int id, const char *format, ...)
+  {
     this->code = id;
     va_list args;
     va_start(args, format);
     setMessage(format, args);
     va_end(args);
-    }
-  vpIoException(int id, const std::string& msg) : vpException(id, msg) { ; }
+  }
+  vpIoException(int id, const std::string &msg) : vpException(id, msg) { ; }
   explicit vpIoException(int id) : vpException(id) { ; }
-  };
+};
 
 
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #if (TARGET_OS_IOS == 0) && !defined(__ANDROID__)
-void replaceAll(std::string& str, const std::string& search, const std::string& replace) {
+void replaceAll(std::string &str, const std::string &search, const std::string &replace)
+{
   size_t start_pos = 0;
   while ((start_pos = str.find(search, start_pos)) != std::string::npos) {
     str.replace(start_pos, search.length(), replace);
     start_pos += replace.length(); // Handles case where 'replace' is a
     // substring of 'search'
-    }
   }
+}
 #endif
 #endif
 
-std::string path(const std::string& pathname) {
+std::string path(const std::string &pathname)
+{
   std::string path(pathname);
 
 #if defined(_WIN32)
@@ -247,10 +257,11 @@ std::string path(const std::string& pathname) {
 #endif
 
   return path;
-  }
+}
 
 
-bool checkFilename(const std::string& filename) {
+bool checkFilename(const std::string &filename)
+{
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   struct stat stbuf;
 #elif defined(_WIN32)
@@ -259,7 +270,7 @@ bool checkFilename(const std::string& filename) {
 
   if (filename.empty()) {
     return false;
-    }
+  }
 
   std::string _filename = path(filename);
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
@@ -267,24 +278,25 @@ bool checkFilename(const std::string& filename) {
 #elif defined(_WIN32)
   if (_stat(_filename.c_str(), &stbuf) != 0)
 #endif
-    {
+  {
     return false;
-    }
+  }
   if ((stbuf.st_mode & S_IFREG) == 0) {
     return false;
-    }
+  }
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   if ((stbuf.st_mode & S_IRUSR) == 0)
 #elif defined(_WIN32)
   if ((stbuf.st_mode & S_IREAD) == 0)
 #endif
-    {
+  {
     return false;
-    }
-  return true;
   }
+  return true;
+}
 
-bool checkDirectory(const std::string& dirname) {
+bool checkDirectory(const std::string &dirname)
+{
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   struct stat stbuf;
 #elif defined(_WIN32) && defined(__MINGW32__)
@@ -295,7 +307,7 @@ bool checkDirectory(const std::string& dirname) {
 
   if (dirname.empty()) {
     return false;
-    }
+  }
 
   std::string _dirname = path(dirname);
 
@@ -311,50 +323,52 @@ bool checkDirectory(const std::string& dirname) {
 #elif defined(_WIN32)
   if (_stat(_dirname.c_str(), &stbuf) != 0)
 #endif
-    {
+  {
     return false;
-    }
+  }
 #if defined(_WIN32) || (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if ((stbuf.st_mode & S_IFDIR) == 0)
 #endif
-    {
+  {
     return false;
-    }
+  }
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   if ((stbuf.st_mode & S_IWUSR) == 0)
 #elif defined(_WIN32)
   if ((stbuf.st_mode & S_IWRITE) == 0)
 #endif
-    {
+  {
     return false;
-    }
-  return true;
   }
+  return true;
+}
 
-bool checkFifo(const std::string& fifofilename) {
+bool checkFifo(const std::string &fifofilename)
+{
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   struct stat stbuf;
 
   std::string _filename = path(fifofilename);
   if (stat(_filename.c_str(), &stbuf) != 0) {
     return false;
-    }
+  }
   if ((stbuf.st_mode & S_IFIFO) == 0) {
     return false;
-    }
+  }
   if ((stbuf.st_mode & S_IRUSR) == 0)
 
-    {
+  {
     return false;
-    }
+  }
   return true;
 #elif defined(_WIN32)
   (void)fifofilename;
   throw(vpIoException(vpIoException::notImplementedError, "Fifo files are not supported on Windows platforms."));
 #endif
-  }
+}
 
-bool remove(const std::string& file_or_dir) {
+bool remove(const std::string &file_or_dir)
+{
   // Check if we have to consider a file or a directory
   if (checkFilename(file_or_dir)
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
@@ -366,7 +380,7 @@ bool remove(const std::string& file_or_dir) {
       return false;
     else
       return true;
-    }
+  }
   else if (checkDirectory(file_or_dir)) {
     // std::cout << "remove directory: " << file_or_dir << std::endl;
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
@@ -378,12 +392,12 @@ bool remove(const std::string& file_or_dir) {
     cmd << "\"";
     int ret = system(cmd.str().c_str());
     if (ret) {
-      }; // to avoid a warning
+    }; // to avoid a warning
     // std::cout << cmd << " return value: " << ret << std::endl;
     return true;
 #else
     throw(vpIoException(vpException::fatalError, "Cannot remove %s: not implemented on iOS Platform",
-      file_or_dir.c_str()));
+                        file_or_dir.c_str()));
 #endif
 #elif defined(_WIN32)
 #if (!defined(WINRT))
@@ -393,44 +407,45 @@ bool remove(const std::string& file_or_dir) {
     cmd << "\"";
     int ret = system(cmd.str().c_str());
     if (ret) {
-      }; // to avoid a warning
+    }; // to avoid a warning
     // std::cout << cmd << " return value: " << ret << std::endl;
     return true;
 #else
     throw(vpIoException(vpException::fatalError, "Cannot remove %s: not implemented on Universal Windows Platform",
-      file_or_dir.c_str()));
+                        file_or_dir.c_str()));
 #endif
 #endif
-    }
+  }
   else {
     std::cout << "Cannot remove: " << file_or_dir << std::endl;
     return false;
-    }
   }
+}
 
-void getUserName(std::string& username) {
+void getUserName(std::string &username)
+{
   // With MinGW, UNIX and _WIN32 are defined
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
   // Get the user name.
-  char* _username = ::getenv("LOGNAME");
+  char *_username = ::getenv("LOGNAME");
   if (!_username) {
     username = "unknown";
-    }
+  }
   else {
     username = _username;
-    }
+  }
 #elif defined(_WIN32)
 #if (!defined(WINRT))
   unsigned int info_buffer_size = 1024;
-  TCHAR* infoBuf = new TCHAR[info_buffer_size];
+  TCHAR *infoBuf = new TCHAR[info_buffer_size];
   DWORD bufCharCount = (DWORD)info_buffer_size;
   // Get the user name.
   if (!GetUserName(infoBuf, &bufCharCount)) {
     username = "unknown";
-    }
+  }
   else {
     username = infoBuf;
-    }
+  }
   delete[] infoBuf;
 #else
   // Universal platform
@@ -439,9 +454,10 @@ void getUserName(std::string& username) {
 #else
   username = "unknown";
 #endif
-  }
+}
 
-int mkdir_p(const char* path, int mode) {
+int mkdir_p(const char *path, int mode)
+{
   /* Adapted from http://stackoverflow.com/a/2336245/119527 */
   const size_t len = strlen(path);
   char _path[PATH_MAX];
@@ -453,12 +469,12 @@ int mkdir_p(const char* path, int mode) {
   if (len > sizeof(_path) - 1) {
     errno = ENAMETOOLONG;
     return -1;
-    }
+  }
   /* Copy string so its mutable */
   strcpy(_path, path);
 
   /* Iterate over the string */
-  for (char* p = _path + 1; *p; p++) { // path cannot be empty
+  for (char *p = _path + 1; *p; p++) { // path cannot be empty
     if (*p == sep) {
       /* Temporarily truncate */
       *p = '\0';
@@ -470,15 +486,15 @@ int mkdir_p(const char* path, int mode) {
       std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
       if (!checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
-        {
+      {
         if (errno != EEXIST) {
           std::cout << "1 in mkdir_p() return -1" << std::endl;
           return -1;
-          }
         }
-      *p = sep;
       }
+      *p = sep;
     }
+  }
 
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if (mkdir(_path, static_cast<mode_t>(mode)) != 0)
@@ -487,17 +503,18 @@ int mkdir_p(const char* path, int mode) {
 
   if (_mkdir(_path) != 0)
 #endif
-    {
+  {
     if (errno != EEXIST) {
       std::cout << "2 in mkdir_p() return -1" << std::endl;
       return -1;
-      }
     }
-
-  return 0;
   }
 
-void makeDirectory(const std::string& dirname) {
+  return 0;
+}
+
+void makeDirectory(const std::string &dirname)
+{
 #if ((!defined(__unix__) && !defined(__unix) && (!defined(__APPLE__) || !defined(__MACH__)))) && !defined(_WIN32)
   std::cerr << "Unsupported platform for vpIoTools::makeDirectory()!" << std::endl;
   return;
@@ -513,7 +530,7 @@ void makeDirectory(const std::string& dirname) {
 
   if (dirname.empty()) {
     throw(vpIoException(vpIoException::invalidDirectoryName, "invalid directory name"));
-    }
+  }
 
   std::string _dirname = path(dirname);
 
@@ -524,27 +541,64 @@ void makeDirectory(const std::string& dirname) {
 #elif defined(_WIN32)
   if (_stat(_dirname.c_str(), &stbuf) != 0)
 #endif
-    {
+  {
     if (mkdir_p(_dirname.c_str(), 0755) != 0) {
       throw(vpIoException(vpIoException::cantCreateDirectory, "Unable to create directory '%s'", dirname.c_str()));
-      }
-    }
-
-  if (checkDirectory(dirname) == false) {
-    throw(vpIoException(vpIoException::cantCreateDirectory, "Unable to create directory '%s'", dirname.c_str()));
     }
   }
 
-int main() {
+  if (checkDirectory(dirname) == false) {
+    throw(vpIoException(vpIoException::cantCreateDirectory, "Unable to create directory '%s'", dirname.c_str()));
+  }
+}
+
+std::string getTempPath()
+{
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
+  std::string username;
+  getUserName(username);
+  return "/tmp/" + username;
+#elif defined(_WIN32) && !defined(WINRT)
+  // https://docs.microsoft.com/en-us/windows/win32/fileio/creating-and-using-a-temporary-file
+  //  Gets the temp path env string (no guarantee it's a valid path).
+  TCHAR lpTempPathBuffer[MAX_PATH];
+  DWORD dwRetVal = GetTempPath(MAX_PATH /* length of the buffer */, lpTempPathBuffer /* buffer for path */);
+  if (dwRetVal > MAX_PATH || (dwRetVal == 0)) {
+    throw vpIoException(vpIoException::cantGetenv, "Error with GetTempPath() call!");
+  }
+  std::string temp_path(lpTempPathBuffer);
+  if (!temp_path.empty()) {
+    if (temp_path.back() == '\\') {
+      temp_path.resize(temp_path.size() - 1);
+    }
+  }
+  else {
+    temp_path = "C:\temp";
+    try {
+      vpIoTools::makeDirectory(temp_path);
+    }
+    catch (...) {
+      throw(vpException(vpException::fatalError, "Cannot set temp path to %s", temp_path.c_str()));
+    }
+  }
+  return temp_path;
+#else
+  throw vpIoException(vpException::fatalError, "Not implemented on this platform!");
+#endif
+}
+
+int main()
+{
   std::cout << "This is a wonderful test" << std::endl;
 
-#if defined(_WIN32)
-  std::string tmp_dir = "C:/temp/";
-#else
-  std::string tmp_dir = "/tmp/";
-#endif
+  std::string tmp_dir = getTempPath();
+  // #if defined(_WIN32)
+  //   std::string tmp_dir = "C:/temp/";
+  // #else
+  //   std::string tmp_dir = "/tmp/";
+  // #endif
 
-  // Get the user login name
+    // Get the user login name
   std::string username;
   getUserName(username);
 
@@ -554,5 +608,4 @@ int main() {
   makeDirectory(tmp_dir);
 
   return EXIT_SUCCESS;
-  }
-
+}
