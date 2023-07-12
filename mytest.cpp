@@ -195,6 +195,7 @@ bool checkFifo(const std::string& fifofilename) {
 #elif defined(_WIN32)
   (void)fifofilename;
   printf("ERROR: Fifo files are not supported on Windows platforms.");
+  return false;
 #endif
   }
 
