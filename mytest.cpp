@@ -461,6 +461,17 @@ void getUserName(std::string &username)
 #endif
 }
 
+bool rootDrive(const std::string &path)
+{
+  std::string drive_ending(":");
+  if (path.size() >= drive_ending.size()) {
+    return (0 == path.compare(path.size() - drive_ending.length(), drive_ending.length(), drive_ending));
+  }
+  else {
+    return false;
+  }
+}
+
 int mkdir_p(const char *path, int mode)
 {
   /* Adapted from http://stackoverflow.com/a/2336245/119527 */
@@ -490,7 +501,7 @@ int mkdir_p(const char *path, int mode)
       (void)mode; // var not used
       std::cout << "1 in mkdir_p() _path: " << _path << std::endl;
       std::cout << "Code retour checkDirectory(_path): " << checkDirectory(_path) << std::endl;
-      if (!checkDirectory(_path) && _mkdir(_path) != 0)
+      if (!rootDrive(_path) && !checkDirectory(_path) && _mkdir(_path) != 0)
 #endif
       {
         if (errno != EEXIST) {
@@ -596,7 +607,9 @@ std::string getTempPath()
 int main()
 {
   std::cout << "This is a wonderful test" << std::endl;
-
+  std::cout << "Is root drive C: : " << rootDrive("C:") << std::endl;
+  std::cout << "Is root drive C:\\ : " << rootDrive("C:\\") << std::endl;
+  std::cout << "Is root drive C:\\temp : " << rootDrive("C:\\temp") << std::endl;
   std::string tmp_dir = getTempPath();
   // #if defined(_WIN32)
   //   std::string tmp_dir = "C:/temp/";
