@@ -405,6 +405,7 @@ bool remove(const std::string &file_or_dir)
     cmd << "rmdir /S /Q ";
     cmd << path(file_or_dir);
     cmd << "\"";
+    std::cout << "Call cmd: " << cmd.str() << std::endl;
     int ret = system(cmd.str().c_str());
     if (ret) {
     }; // to avoid a warning
