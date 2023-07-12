@@ -501,6 +501,11 @@ int mkdir_p(const std::string &path_in, int mode)
   for (size_t pos = 0; (pos = _path.find(separator)) != std::string::npos;) {
     _sub_path += _path.substr(0, pos + 1);
     std::cout << "sub_path: " << _sub_path << std::endl;
+    // Continue if sub_path = separator
+    if (pos == 0) {
+      std::cout << "sub_path = separaror" << std::endl;
+      continue;
+    }
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
     if (mkdir(_sub_path.c_str(), static_cast<mode_t>(mode)) != 0)
 #elif defined(_WIN32)
