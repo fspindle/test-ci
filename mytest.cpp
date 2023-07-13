@@ -295,6 +295,16 @@ bool checkFilename(const std::string &filename)
   return true;
 }
 
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
+#define VP_STAT stat
+#elif defined(_WIN32) && defined(__MINGW32__)
+#define VP_STAT stat
+#elif defined(_WIN32)
+#define VP_STAT _stat
+#else
+#define VP_STAT stat
+#endif
+
 bool checkDirectory(const std::string &dirname)
 {
 #if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
@@ -311,35 +321,26 @@ bool checkDirectory(const std::string &dirname)
 
   std::string _dirname = path(dirname);
 
-#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
-  if (stat(_dirname.c_str(), &stbuf) != 0) {
-    return false;
-  }
-#elif defined(_WIN32) && defined(__MINGW32__)
-  //int ret = stat(_dirname.c_str(), &stbuf);
-  //std::cout << "Code retour stat(" << _dirname << ") 1: " << ret << std::endl;
-  // Remove trailing separator character if any
-  // AppVeyor: Windows 6.3.9600 AMD64 ; C:/MinGW/bin/g++.exe  (ver 5.3.0) ;
-  // GNU Make 3.82.90 Built for i686-pc-mingw32
-  if (_dirname.at(_dirname.size() - 1) == separator)
-    _dirname = _dirname.substr(0, _dirname.size() - 1);
-  //{
-   // ret = stat(_dirname.c_str(), &stbuf);
-  //std::cout << "Code retour stat(" << _dirname << ") 2: " << ret << std::endl;
-  //}
-  if (stat(_dirname.c_str(), &stbuf) != 0) {
-    return false;
-  }
-#elif defined(_WIN32)
-  if (_stat(_dirname.c_str(), &stbuf) != 0) {
-    // Test again adding the separator to consider the specific case of a drive like "C:" that is not considered as a directory,
-    // while "C:\" is considered as a directory
-    if (_stat((_dirname + separator).c_str(), &stbuf) != 0) {
-      std::cout << "1 checkDirectory(" << _dirname << ") return false" << std::endl;
-      return false;
+  std::cout << "DEBUG 1 test _dirname: " << _dirname << std::endl;
+  if (VP_STAT(_dirname.c_str(), &stbuf) != 0) {
+    std::cout << "DEBUG 1 _dirname: " << _dirname << " is not a dir" << std::endl;
+    // Test adding the separator if not already present
+    if (_dirname.at(_dirname.size() - 1) != separator) {
+      std::cout << "DEBUG 2 test if _dirname + separator: " << _dirname + separator << " is a dir ?" << std::endl;
+      if (VP_STAT((_dirname + separator).c_str(), &stbuf) != 0) {
+        std::cout << "DEBUG 2 _dirname + separator: " << _dirname + separator << " is not a dir" << std::endl;
+        return false;
+      }
+    }
+    // Test removing the separator if already present
+    if (_dirname.at(_dirname.size() - 1) == separator) {
+      std::cout << "DEBUG 2 test if _dirname - separator: " << _dirname.substr(0, _dirname.size() - 1) << " is a dir ?" << std::endl;
+      if (VP_STAT((_dirname.substr(0, _dirname.size() - 1)).c_str(), &stbuf) != 0) {
+        std::cout << "DEBUG 3 _dirname - separator: " << _dirname.substr(0, _dirname.size() - 1) << " is not a dir" << std::endl;
+        return false;
+      }
     }
   }
-#endif
 
 #if defined(_WIN32) || (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
   if ((stbuf.st_mode & S_IFDIR) == 0)
