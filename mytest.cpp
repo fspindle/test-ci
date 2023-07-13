@@ -677,23 +677,92 @@ std::string getTempPath()
 #endif
 }
 
+std::string createFilePath(const std::string &parent, const std::string &child)
+{
+  if (child.size() == 0 && parent.size() == 0) {
+    return "";
+  }
+
+  if (child.size() == 0) {
+    return path(parent);
+  }
+
+  if (parent.size() == 0) {
+    return path(child);
+  }
+
+  std::string convertedParent = path(parent);
+  std::string convertedChild = path(child);
+
+  std::stringstream ss;
+  ss << separator;
+  std::string stringSeparator;
+  ss >> stringSeparator;
+
+  std::string lastConvertedParentChar = convertedParent.substr(convertedParent.size() - 1);
+  std::string firstConvertedChildChar = convertedChild.substr(0, 1);
+
+  if (lastConvertedParentChar == stringSeparator) {
+    convertedParent = convertedParent.substr(0, convertedParent.size() - 1);
+  }
+
+  if (firstConvertedChildChar == stringSeparator) {
+    convertedChild = convertedChild.substr(1);
+  }
+
+  return std::string(convertedParent + separator + convertedChild);
+}
+
 int main()
 {
   std::cout << "This is a wonderful test" << std::endl;
-#if defined(_WIN32)
-  std::cout << "Is root drive C: : " << rootDrive("C:") << std::endl;
-  std::cout << "Is root drive C:\\ : " << rootDrive("C:\\") << std::endl;
-  std::cout << "Is root drive C:\\temp : " << rootDrive("C:\\temp") << std::endl;
 
-  std::cout << "Check directory C: : " << checkDirectory("C:") << std::endl;
-  std::cout << "Check directory C:\\ : " << checkDirectory("C:\\") << std::endl;
-  std::cout << "Check directory C:\\temp : " << checkDirectory("C:\\temp") << std::endl;
+  {
+    std::string opath;
+    // Set the default output path
+#if defined(_WIN32)
+    std::string opt_opath = "C:/temp";
 #else
-  std::cout << "Check directory /tmp : " << checkDirectory("/tmp") << std::endl;
-  std::cout << "Check directory /tmp/runner : " << checkDirectory("/tmp/runner") << std::endl;
-  std::cout << "Check directory /tmp/runner/myfolder : " << checkDirectory("/tmp/runner/myfolder") << std::endl;
+    std::string opt_opath = "/tmp";
 #endif
 
+    // Get the user login name
+    getUserName(username);
+
+    if (!opt_opath.empty())
+      opath = opt_opath;
+
+    // Append to the output path string, the login name of the user
+    opath = createFilePath(opath, username);
+
+    // Test if the output path exist. If no try to create it
+    if checkDirectory(opath) == false) {
+      try {
+        // Create the dirname
+        makeDirectory(opath);
+      } catch (...) {
+        std::cerr << std::endl << "ERROR:" << std::endl;
+        std::cerr << "  Cannot create " << opath << std::endl;
+        std::cerr << "  Check your -o " << opt_opath << " option " << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+  }
+  {
+#if defined(_WIN32)
+    std::cout << "Is root drive C: : " << rootDrive("C:") << std::endl;
+    std::cout << "Is root drive C:\\ : " << rootDrive("C:\\") << std::endl;
+    std::cout << "Is root drive C:\\temp : " << rootDrive("C:\\temp") << std::endl;
+
+    std::cout << "Check directory C: : " << checkDirectory("C:") << std::endl;
+    std::cout << "Check directory C:\\ : " << checkDirectory("C:\\") << std::endl;
+    std::cout << "Check directory C:\\temp : " << checkDirectory("C:\\temp") << std::endl;
+#else
+    std::cout << "Check directory /tmp : " << checkDirectory("/tmp") << std::endl;
+    std::cout << "Check directory /tmp/runner : " << checkDirectory("/tmp/runner") << std::endl;
+    std::cout << "Check directory /tmp/runner/myfolder : " << checkDirectory("/tmp/runner/myfolder") << std::endl;
+#endif
+  }
 
   {
     std::string tmp_dir = getTempPath();
