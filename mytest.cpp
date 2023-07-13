@@ -693,22 +693,29 @@ int main()
   std::cout << "Check directory /tmp/runner : " << checkDirectory("/tmp/runner") << std::endl;
   std::cout << "Check directory /tmp/runner/myfolder : " << checkDirectory("/tmp/runner/myfolder") << std::endl;
 #endif
-  std::string tmp_dir = getTempPath();
-  // #if defined(_WIN32)
-  //   std::string tmp_dir = "C:/temp/";
-  // #else
-  //   std::string tmp_dir = "/tmp/";
-  // #endif
 
+
+  {
+    std::string tmp_dir = getTempPath();
+    tmp_dir += "/test_xml_parser_rect_oriented/";
+    remove(tmp_dir);
+    std::cout << "Create: " << tmp_dir << std::endl;
+    makeDirectory(tmp_dir);
+  }
+  {
+#if defined(_WIN32)
+    std::string tmp_dir = "C:/temp/";
+#else
+    std::string tmp_dir = "/tmp/";
+#endif
     // Get the user login name
-  // std::string username;
-  // getUserName(username);
+    std::string username;
+    getUserName(username);
+    tmp_dir += "/" + username + "/test_xml_parser_rect_oriented/";
 
-  //tmp_dir += "/" + username + "/test_xml_parser_rect_oriented/";
-  tmp_dir += "/test_xml_parser_rect_oriented/";
-  remove(tmp_dir);
-  std::cout << "Create: " << tmp_dir << std::endl;
-  makeDirectory(tmp_dir);
-
+    remove(tmp_dir);
+    std::cout << "Create: " << tmp_dir << std::endl;
+    makeDirectory(tmp_dir);
+  }
   return EXIT_SUCCESS;
 }
