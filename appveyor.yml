@@ -46,4 +46,4 @@ build_script:
   - if "%TARGET%"=="mingw" cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%configuration% ..\test-ci
   - if "%TARGET%"=="mingw" cmake --build . --config %configuration% -- -j2
   - if "%TARGET%"=="mingw" dir C:\projects\test-ci\build
-  - if "%TARGET%"=="mingw" ctest --output-on-failure
+  - if "%TARGET%"=="mingw" ctest --output-on-failure -V
