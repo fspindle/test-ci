@@ -719,6 +719,7 @@ int main()
 
   {
     std::string opath;
+    std::string username;
     // Set the default output path
 #if defined(_WIN32)
     std::string opt_opath = "C:/temp";
