@@ -737,11 +737,12 @@ int main()
     opath = createFilePath(opath, username);
 
     // Test if the output path exist. If no try to create it
-    if checkDirectory(opath) == false) {
+    if (checkDirectory(opath) == false) {
       try {
         // Create the dirname
         makeDirectory(opath);
-      } catch (...) {
+      }
+      catch (...) {
         std::cerr << std::endl << "ERROR:" << std::endl;
         std::cerr << "  Cannot create " << opath << std::endl;
         std::cerr << "  Check your -o " << opt_opath << " option " << std::endl;
