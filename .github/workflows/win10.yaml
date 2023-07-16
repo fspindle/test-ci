@@ -44,7 +44,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "Visual Studio 16 2019" -A "x64" -DCMAKE_GENERATOR_PLATFORM=x64
+        cmake .. -G "Visual Studio 16 2019" -A "x64"
       # type ViSP-third-party.txt
 
     - name: Build ViSP
@@ -63,8 +63,11 @@ jobs:
       #run: |
       #  set PATH=%PATH%;%cd%\install\x64\vc16\bin
       #  ctest --output-on-failure -C Release -V
+      #  echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
       run: |
-        echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
+        set VISP_INPUT_IMAGE_PATH=${{ env.VISP_INPUT_IMAGE_PATH }}
+        echo "VISP_INPUT_IMAGE_PATH: "
+        echo %VISP_INPUT_IMAGE_PATH%
         set PATH=%PATH%;${{ github.workspace }}\build
         echo "PATH: "
         echo %PATH%
