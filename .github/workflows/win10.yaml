@@ -45,7 +45,7 @@ jobs:
         set VISP_INPUT_IMAGE_PATH=${{ env.VISP_INPUT_IMAGE_PATH }}
         echo "VISP_INPUT_IMAGE_PATH: "
         echo %VISP_INPUT_IMAGE_PATH%
-        set VISP_INPUT_IMAGE_PATH="C:\Users\runneradmin\visp-images"
+        echo "VISP_INPUT_IMAGE_PATH=C:\Users\runneradmin\visp-images" >> $GITHUB_ENV
         echo "VISP_INPUT_IMAGE_PATH: "
         echo %VISP_INPUT_IMAGE_PATH%
 
