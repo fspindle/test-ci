@@ -714,10 +714,67 @@ std::string createFilePath(const std::string &parent, const std::string &child)
   return std::string(convertedParent + separator + convertedChild);
 }
 
+std::string vp_getenv(const std::string &env)
+{
+#if defined(_WIN32) && defined(WINRT)
+  throw(vpIoException(vpIoException::cantGetenv, "Cannot get the environment variable value: not "
+                      "implemented on Universal Windows Platform"));
+#else
+  std::string value;
+  // Get the environment variable value.
+  char *_value = ::getenv(env.c_str());
+  if (!_value) {
+    throw(vpIoException(vpIoException::cantGetenv, "Cannot get the environment variable value"));
+  }
+  value = _value;
+
+  return value;
+#endif
+}
+
+std::string getViSPImagesDataPath()
+{
+  std::string data_path;
+  std::string file_to_test("mbt/cube.cao");
+  std::string filename;
+  // Test if VISP_INPUT_IMAGE_PATH env var is set
+  try {
+    data_path = vp_getenv("VISP_INPUT_IMAGE_PATH");
+    filename = data_path + "/" + file_to_test;
+    if (checkFilename(filename))
+      return data_path;
+    data_path = vp_getenv("VISP_INPUT_IMAGE_PATH") + "/ViSP-images";
+    filename = data_path + "/" + file_to_test;
+    if (checkFilename(filename))
+      return data_path;
+    data_path = vp_getenv("VISP_INPUT_IMAGE_PATH") + "/visp-images";
+    filename = data_path + "/" + file_to_test;
+    if (checkFilename(filename))
+      return data_path;
+  }
+  catch (...) {
+  }
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))) // UNIX
+  // Test if visp-images-data package is installed (Ubuntu and Debian)
+  data_path = "/usr/share/visp-images-data/ViSP-images";
+  filename = data_path + "/" + file_to_test;
+  if (checkFilename(filename))
+    return data_path;
+  data_path = "/usr/share/visp-images-data/visp-images";
+  filename = data_path + "/" + file_to_test;
+  if (checkFilename(filename))
+    return data_path;
+#endif
+  data_path = "";
+  return data_path;
+}
+
 int main()
 {
   std::cout << "This is a wonderful test" << std::endl;
-
+  {
+    std::cout << "VISP_INPUT_IMAGE_PATH: " << getViSPImagesDataPath() << std::endl;
+  }
   {
     std::string opath;
     std::string username;
