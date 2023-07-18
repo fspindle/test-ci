@@ -33,7 +33,7 @@ jobs:
       run: pwd
 
     - name: Clone visp-images
-      shell: bash
+      #shell: bash
       # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
       run: |
         git clone --depth 1 https://github.com/lagadic/visp-images ${HOME}/visp-images
