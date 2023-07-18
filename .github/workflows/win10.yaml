@@ -37,17 +37,8 @@ jobs:
       # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
       run: |
         git clone --depth 1 https://github.com/lagadic/visp-images ${HOME}/visp-images
-        echo "HOME 1: "
-        echo $HOME
-        echo "HOME 2: "
-        echo ${HOME}
-        echo "VISP_INPUT_IMAGE_PATH=$HOME/visp-images" >> $GITHUB_ENV
-        set VISP_INPUT_IMAGE_PATH=${{ env.VISP_INPUT_IMAGE_PATH }}
-        echo "VISP_INPUT_IMAGE_PATH: "
-        echo %VISP_INPUT_IMAGE_PATH%
         echo "VISP_INPUT_IMAGE_PATH=C:\Users\runneradmin\visp-images" >> $GITHUB_ENV
-        echo "VISP_INPUT_IMAGE_PATH: "
-        echo %VISP_INPUT_IMAGE_PATH%
+        echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
 
     - name: Configure ViSP
       working-directory: ${{ github.workspace }}
@@ -75,9 +66,6 @@ jobs:
       #  ctest --output-on-failure -C Release -V
       #  echo "VISP_INPUT_IMAGE_PATH: ${{ env.VISP_INPUT_IMAGE_PATH }}"
       run: |
-        set VISP_INPUT_IMAGE_PATH=${{ env.VISP_INPUT_IMAGE_PATH }}
-        echo "VISP_INPUT_IMAGE_PATH: "
-        echo %VISP_INPUT_IMAGE_PATH%
         set PATH=%PATH%;${{ github.workspace }}\build
         echo "PATH: "
         echo %PATH%
